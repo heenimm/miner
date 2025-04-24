@@ -1,25 +1,48 @@
 import pygame
-import sys
-from game_window import Miner
-from resources import screen
 
-clock = pygame.time.Clock()
-game = Miner()
+from config import WINDOW_WIDTH
+from end_window import EndWindow
+from game_window import Miner
+from start_window import StartWindow
+
 
 def main():
-    while True:
+    pygame.init()
+    global screen
+    screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_WIDTH + 64))
+    pygame.display.set_caption("Сапер")
+    start_window = StartWindow()
+    end_window = None
+    game = Miner()
+    running = True
+    game_started = False
+    while running:
         screen.fill((0, 0, 0))
-        game.draw()
+        if not game_started:
+            start_window.draw()
+        else:
+            if not game.game_over:
+                game.draw()
+            else:
+                end_window = EndWindow(game.win, int(game.end_time - game.start_time), game.score)
+                end_window.draw()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.MOUSEBUTTONUP:
-                game.handle_click(event.pos, right_click=event.button == 3)
+                running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if not game_started and start_window.check_start(event.pos):
+                    game.reset()
+                    game_started = True
+                elif game.game_over and end_window.check_restart(event.pos):
+                    game.reset()
+                    game_started = True
+                elif game_started:
+                    game.handle_click(event.pos, event.button == 3)
 
         pygame.display.flip()
-        clock.tick(30)
+
+    pygame.quit()
 
 if __name__ == "__main__":
     main()

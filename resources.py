@@ -2,7 +2,7 @@ import pygame
 from config import WINDOW_HEIGHT, WINDOW_WIDTH
 
 pygame.init()
-font = pygame.font.SysFont("arial", 24)
+font = pygame.font.SysFont("Arial", 24)
 
 flag_img = pygame.image.load("images/flag.png")
 mine_img = pygame.image.load("images/bug.png")
